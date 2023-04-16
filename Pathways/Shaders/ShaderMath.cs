@@ -110,4 +110,10 @@ public class ShaderMath
     {
         return new Vector3(MathF.Max(a.X, b.X), MathF.Max(a.Y, b.Y), MathF.Max(a.Z, b.Z));
     }
+    
+    [ShaderMethod]
+    public static Vector3 Reflect(Vector3 i, Vector3 n)
+    {
+        return i - MulByScalar(n, 2.0f * Vector3.Dot(i, n));
+    }
 }

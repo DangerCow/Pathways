@@ -24,16 +24,42 @@ public class DemoScene : Scene
         plane.Color = Color.WHITE;
         plane.Type = PathwayObject.ObjectType.Plane;
         
+        PathwayObject sphere = new PathwayObject();
+        sphere.Position = new Vector3(0, 3, 0);
+        sphere.Rotation = new Rotation(new Vector3(0, 0, 0));
+        sphere.Scale = new Vector3(1, 1, 1);
+        sphere.Color = Color.BLUE;
+        sphere.Smoothness = 1f;
+        sphere.Type = PathwayObject.ObjectType.Sphere;
+        
+        PathwayObject Sphere2 = new PathwayObject();
+        Sphere2.Position = new Vector3(0, 5, 0);
+        Sphere2.Rotation = new Rotation(new Vector3(0, 0, 0));
+        Sphere2.Scale = new Vector3(1, 1, 1);
+        Sphere2.Color = Color.YELLOW;
+        Sphere2.Smoothness = 0.1f;
+        Sphere2.Type = PathwayObject.ObjectType.Sphere;
+        
+        
         Objects.Add(cube);
         Objects.Add(plane);
+        Objects.Add(sphere);
+        Objects.Add(Sphere2);
         
         PathwayLight light = new PathwayLight();
-        light.Position = new Vector3(0, 5, 5);
+        light.Position = new Vector3(2, 8, 8);
         light.Color = Color.WHITE;
         light.Intensity = 1;
         light.Type = PathwayLight.LightType.Point;
         
+        PathwayLight light2 = new PathwayLight();
+        light2.Position = new Vector3(-5, 5, 5);
+        light2.Color = Color.BLUE;
+        light2.Intensity = 0.5f;
+        light2.Type = PathwayLight.LightType.Point;
+        
         Lights.Add(light);
+        Lights.Add(light2);
     }
 
     public override void Update()

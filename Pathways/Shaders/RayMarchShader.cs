@@ -92,7 +92,7 @@ public readonly partial struct RayMarchShader : IComputeShader
                     {
                         // we hit an object
                         Vector3 normal = GetNormal(point, obj.Position, obj.Scale, obj.Rotation, obj.ObjectType);
-                        return Shade(point, normal, obj.Color);
+                        return Shade(point, normal,obj);
                     }
                 }
             }
@@ -215,7 +215,7 @@ public readonly partial struct RayMarchShader : IComputeShader
 
     #region Shading functions
 
-    private Vector3 Shade(Vector3 point, Vector3 normal, Vector3 color)
+    private Vector3 Shade(Vector3 point, Vector3 normal, PathwayObject.ShaderRepresentation obj)
     {
         Vector3 lightAccum = new Vector3(0, 0, 0);
         
@@ -231,7 +231,7 @@ public readonly partial struct RayMarchShader : IComputeShader
             {
                 // point light
                 case 0:
-                    lightAccumTemp = LightAccumPoint(point, normal, color, light);
+                    lightAccumTemp = LightAccumPoint(point, normal, obj, light);
                     
                     shadowRayDir = light.Position - point;
                     shadowRayDir = ShaderMath.Normalize(shadowRayDir);
@@ -243,7 +243,7 @@ public readonly partial struct RayMarchShader : IComputeShader
                     break;
                 // directional light
                 case 1:
-                    lightAccumTemp = LightAccumDirectional(point + normal * 0.001f, normal , color, light);
+                    lightAccumTemp = LightAccumDirectional(point + normal * 0.001f, normal , obj, light);
                     
                     shadowRayDir = new Vector3(0, 0, 1);
                     shadowRayDir = ShaderMath.Transform(shadowRayDir, light.Rotation);
@@ -255,28 +255,36 @@ public readonly partial struct RayMarchShader : IComputeShader
                     break;
             }
         }
-        
+
         // ambient light
-        lightAccum += color * 0.1f;
+        lightAccum += obj.Color * 0.1f;
         
         return lightAccum;
     }
     
-    private Vector3 LightAccumPoint(Vector3 point, Vector3 normal, Vector3 color, PathwayLight.ShaderRepresentation light)
+    private Vector3 LightAccumPoint(Vector3 point, Vector3 normal, PathwayObject.ShaderRepresentation obj, PathwayLight.ShaderRepresentation light)
     {
         Vector3 lightAccum = new Vector3(0, 0, 0);
         
         Vector3 lightDir = light.Position - point;
         lightDir = ShaderMath.Normalize(lightDir);
         
+        // calculate the diffuse light
         float diffuse = MathF.Max(0, Vector3.Dot(normal, lightDir));
         
-        lightAccum += color * light.Color * diffuse * light.Intensity;
+        // calculate the specular light
+        Vector3 viewDir = Camera.Position - point;
+        viewDir = ShaderMath.Normalize(viewDir);
+        Vector3 halfwayDir = ShaderMath.Normalize(lightDir + viewDir);
+        
+        float specular = MathF.Pow(MathF.Max(0, Vector3.Dot(normal, halfwayDir)), obj.Smoothness * 64f);
+        
+        lightAccum += obj.Color * light.Color * (diffuse + specular * obj.Smoothness) * light.Intensity;
 
         return lightAccum;
     }
     
-    private Vector3 LightAccumDirectional(Vector3 point, Vector3 normal, Vector3 color, PathwayLight.ShaderRepresentation light)
+    private Vector3 LightAccumDirectional(Vector3 point, Vector3 normal, PathwayObject.ShaderRepresentation obj, PathwayLight.ShaderRepresentation light)
     {
         Vector3 lightAccum = new Vector3(0, 0, 0);
         
@@ -285,9 +293,17 @@ public readonly partial struct RayMarchShader : IComputeShader
         Vector3 lightDir = new Vector3(0, 0, 1);
         lightDir = ShaderMath.Transform(lightDir, lightRot);
         
+        // calculate the diffuse light
         float diffuse = MathF.Max(0, Vector3.Dot(normal, lightDir));
         
-        lightAccum += color * light.Color * diffuse * light.Intensity;
+        // calculate the specular light
+        Vector3 viewDir = Camera.Position - point;
+        viewDir = ShaderMath.Normalize(viewDir);
+        Vector3 halfwayDir = ShaderMath.Normalize(lightDir + viewDir);
+        
+        float specular = MathF.Pow(MathF.Max(0, Vector3.Dot(normal, halfwayDir)), obj.Smoothness * 64f);
+        
+        lightAccum += obj.Color * light.Color * (diffuse + specular * obj.Smoothness) * light.Intensity;
         
         return lightAccum;
     }

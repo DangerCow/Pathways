@@ -15,6 +15,7 @@ public class PathwayObject
         public int ObjectType;
 
         public Vector3 Color;
+        public float Smoothness;
     }
 
     public enum ObjectType
@@ -31,6 +32,7 @@ public class PathwayObject
     public ObjectType Type;
 
     public Color Color;
+    public float Smoothness = 0.5f;
 
     public PathwayObject(Vector3 position, Rotation rotation, Vector3 scale, ObjectType type, Color color)
     {
@@ -72,7 +74,8 @@ public class PathwayObject
             Rotation = Rotation.ToVector4(),
             Scale = Scale,
             ObjectType = (int)Type,
-            Color = color
+            Color = color,
+            Smoothness = Smoothness
         };
     }
 }
