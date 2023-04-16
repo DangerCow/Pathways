@@ -11,7 +11,7 @@ public class DemoScene : Scene
         Camera = new Camera(new Vector3(0, 6, 10), new Rotation(new Vector3(-30, 0, 0)), 90);
 
         PathwayObject cube = new PathwayObject();
-        cube.Position = new Vector3(0, 0, 0);
+        cube.Position = new Vector3(0, 1, 0);
         cube.Rotation = new Rotation(new Vector3(0, 45, 0));
         cube.Scale = new Vector3(1, 1, 1);
         cube.Color = Color.RED;

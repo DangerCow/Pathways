@@ -89,7 +89,7 @@ public readonly partial struct RayMarchShader : IComputeShader
             {
                 // Sphere
                 case 0:
-                    distance = MathF.Min(distance, SphereSDF(point, obj.Position, ShaderMath.Length(obj.Scale)));
+                    distance = MathF.Min(distance, SphereSDF(point, obj.Position, obj.Scale.X));
                     break;
             }
         }
