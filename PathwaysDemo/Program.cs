@@ -15,8 +15,17 @@ public class DemoScene : Scene
         cube.Rotation = new Rotation(new Vector3(0, 45, 0));
         cube.Scale = new Vector3(1, 1, 1);
         cube.Color = Color.RED;
+        cube.Type = PathwayObject.ObjectType.Box;
+        
+        PathwayObject plane = new PathwayObject();
+        plane.Position = new Vector3(0, 0, 0);
+        plane.Rotation = new Rotation(new Vector3(0, 0, 0));
+        plane.Scale = new Vector3(10, 1, 10);
+        plane.Color = Color.WHITE;
+        plane.Type = PathwayObject.ObjectType.Plane;
         
         Objects.Add(cube);
+        Objects.Add(plane);
     }
 
     public override void Update()

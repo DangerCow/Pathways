@@ -64,7 +64,7 @@ public class PathwayObject
 
     public ShaderRepresentation GetShaderRepresentation()
     {
-        Vector3 color = new Vector3(Color.r, Color.g, Color.b);
+        Vector3 color = new Vector3(Color.r / 255f, Color.g / 255f, Color.b / 255f);
 
         return new ShaderRepresentation
         {

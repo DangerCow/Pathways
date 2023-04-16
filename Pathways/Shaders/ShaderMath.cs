@@ -73,4 +73,41 @@ public class ShaderMath
     {
         return MathF.Sqrt(value.X * value.X + value.Y * value.Y + value.Z * value.Z);
     }
+    
+    [ShaderMethod]
+    public static Vector3 Clamp(Vector3 x, Vector3 min, Vector3 max)
+    {
+        return new Vector3(Math.Clamp(x.X, min.X, max.X), Math.Clamp(x.Y, min.Y, max.Y), Math.Clamp(x.Z, min.Z, max.Z));
+    }
+    
+    [ShaderMethod]
+    public static Vector3 Smoothstep(Vector3 edge0, Vector3 edge1, Vector3 x)
+    {
+        Vector3 t = Clamp((x - edge0) / (edge1 - edge0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+        return t * t * (new Vector3(3, 3, 3) - new Vector3(2, 2, 2) * t);
+    }
+    
+    [ShaderMethod]
+    public static Vector3 MulByScalar(Vector3 v, float s)
+    {
+        return new Vector3(v.X * s, v.Y * s, v.Z * s);
+    }
+    
+    [ShaderMethod]
+    public static Vector3 Abs(Vector3 v)
+    {
+        return new Vector3(MathF.Abs(v.X), MathF.Abs(v.Y), MathF.Abs(v.Z));
+    }
+    
+    [ShaderMethod]
+    public static Vector3 Min(Vector3 a, Vector3 b)
+    {
+        return new Vector3(MathF.Min(a.X, b.X), MathF.Min(a.Y, b.Y), MathF.Min(a.Z, b.Z));
+    }
+    
+    [ShaderMethod]
+    public static Vector3 Max(Vector3 a, Vector3 b)
+    {
+        return new Vector3(MathF.Max(a.X, b.X), MathF.Max(a.Y, b.Y), MathF.Max(a.Z, b.Z));
+    }
 }
