@@ -26,6 +26,14 @@ public class DemoScene : Scene
         
         Objects.Add(cube);
         Objects.Add(plane);
+        
+        PathwayLight light = new PathwayLight();
+        light.Position = new Vector3(0, 5, 5);
+        light.Color = Color.WHITE;
+        light.Intensity = 1;
+        light.Type = PathwayLight.LightType.Point;
+        
+        Lights.Add(light);
     }
 
     public override void Update()
@@ -40,12 +48,6 @@ public class DemoScene : Scene
         base.Draw2D();
         Raylib.DrawText($"Camera Position: {Camera.Position}", 10, 40, 1, Color.WHITE);
         Raylib.DrawText($"Camera Rotation: {Camera.Rotation.ToString()}", 10, 50, 1, Color.WHITE);
-    }
-
-    public override void Draw3D()
-    {
-        base.Draw3D();
-        Raylib.DrawGrid(10, 1.0f);
     }
 }
 

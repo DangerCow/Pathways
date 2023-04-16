@@ -13,8 +13,11 @@ public readonly partial struct RayMarchShader : IComputeShader
     public readonly int Height;
 
     public readonly ReadWriteBuffer<PathwayObject.ShaderRepresentation> Objects;
+    public readonly ReadWriteBuffer<PathwayLight.ShaderRepresentation> Lights;
 
     public readonly Camera.ShaderRepresentation Camera;
+
+    #region Dispatch
 
     public void Execute()
     {
@@ -50,6 +53,10 @@ public readonly partial struct RayMarchShader : IComputeShader
         Buffer[ThreadIds.X] = outInt;
     }
 
+    #endregion
+
+    #region Ray Marching
+
     private Vector3 RayMarch(Vector3 rayOrigin, Vector3 rayDirection)
     {
         Vector3 hitColor = new Vector3();
@@ -64,29 +71,30 @@ public readonly partial struct RayMarchShader : IComputeShader
             closestObject.ObjectType = -1;
 
             float distance = float.MaxValue;
-            
+
             for (int j = 0; j < Objects.Length; j++)
             {
+                var obj = Objects[j];
                 float objDistance = ObjectSdf(point, Objects[j]);
                 distance = MathF.Min(distance, objDistance);
-                
+
+                // dont allow negative distances
+                if (distance < 0)
+                {
+                    distance = float.MaxValue;
+                }
+
                 if (objDistance == distance)
                 {
-                    closestObject = Objects[j];
-                }
-            }
-            
-            // dont allow negative distances
-            if (distance < 0)
-            {
-                distance = float.MaxValue;
-            }
+                    closestObject = obj;
 
-            if (distance < 0.001f)
-            {
-                if (closestObject.ObjectType == -1) break;
-                hitColor = closestObject.Color;
-                break;
+                    if (distance < 0.001f)
+                    {
+                        // we hit an object
+                        Vector3 normal = GetNormal(point, obj.Position, obj.Scale, obj.Rotation, obj.ObjectType);
+                        return Shade(point, normal, obj.Color);
+                    }
+                }
             }
 
             t += distance;
@@ -95,7 +103,22 @@ public readonly partial struct RayMarchShader : IComputeShader
         return hitColor;
     }
 
-    // SDF FUNCTIONS
+    #endregion
+
+    #region SDF functions
+    
+    private float SceneSdf(Vector3 point)
+    {
+        float distance = float.MaxValue;
+
+        for (int i = 0; i < Objects.Length; i++)
+        {
+            float objDistance = ObjectSdf(point, Objects[i]);
+            distance = MathF.Min(distance, objDistance);
+        }
+
+        return distance;
+    }
 
     private float ObjectSdf(Vector3 point, PathwayObject.ShaderRepresentation obj)
     {
@@ -185,9 +208,107 @@ public readonly partial struct RayMarchShader : IComputeShader
         normal += kyxy * Sdf(point + kyxy * h, center, size, rotation, sdfType);
         normal += kxxx * Sdf(point + kxxx * h, center, size, rotation, sdfType);
 
-        // fix box normals
-
-
         return ShaderMath.Normalize(normal);
     }
+
+    #endregion
+
+    #region Shading functions
+
+    private Vector3 Shade(Vector3 point, Vector3 normal, Vector3 color)
+    {
+        Vector3 lightAccum = new Vector3(0, 0, 0);
+        
+        for (int i = 0; i < Lights.Length; i++)
+        {
+            PathwayLight.ShaderRepresentation light = Lights[i];
+            
+            Vector3 shadowRayOrigin;
+            Vector3 shadowRayDir;
+            Vector3 lightAccumTemp;
+            
+            switch (light.Type)
+            {
+                // point light
+                case 0:
+                    lightAccumTemp = LightAccumPoint(point, normal, color, light);
+                    
+                    shadowRayDir = light.Position - point;
+                    shadowRayDir = ShaderMath.Normalize(shadowRayDir);
+                    shadowRayOrigin = point + normal * 0.001f;
+                    
+                    lightAccumTemp *= Shadow(shadowRayOrigin, shadowRayDir, 100, 64);
+                    
+                    lightAccum += lightAccumTemp;
+                    break;
+                // directional light
+                case 1:
+                    lightAccumTemp = LightAccumDirectional(point + normal * 0.001f, normal , color, light);
+                    
+                    shadowRayDir = new Vector3(0, 0, 1);
+                    shadowRayDir = ShaderMath.Transform(shadowRayDir, light.Rotation);
+                    shadowRayOrigin = point + normal * 0.001f;
+                    
+                    lightAccumTemp *= Shadow(shadowRayOrigin, shadowRayDir, 100, 16);
+                    
+                    lightAccum += lightAccumTemp;
+                    break;
+            }
+        }
+        
+        // ambient light
+        lightAccum += color * 0.1f;
+        
+        return lightAccum;
+    }
+    
+    private Vector3 LightAccumPoint(Vector3 point, Vector3 normal, Vector3 color, PathwayLight.ShaderRepresentation light)
+    {
+        Vector3 lightAccum = new Vector3(0, 0, 0);
+        
+        Vector3 lightDir = light.Position - point;
+        lightDir = ShaderMath.Normalize(lightDir);
+        
+        float diffuse = MathF.Max(0, Vector3.Dot(normal, lightDir));
+        
+        lightAccum += color * light.Color * diffuse * light.Intensity;
+
+        return lightAccum;
+    }
+    
+    private Vector3 LightAccumDirectional(Vector3 point, Vector3 normal, Vector3 color, PathwayLight.ShaderRepresentation light)
+    {
+        Vector3 lightAccum = new Vector3(0, 0, 0);
+        
+        Vector4 lightRot = light.Rotation;
+        
+        Vector3 lightDir = new Vector3(0, 0, 1);
+        lightDir = ShaderMath.Transform(lightDir, lightRot);
+        
+        float diffuse = MathF.Max(0, Vector3.Dot(normal, lightDir));
+        
+        lightAccum += color * light.Color * diffuse * light.Intensity;
+        
+        return lightAccum;
+    }
+    
+    private float Shadow(Vector3 rayOrigin, Vector3 rayDir, float tMax, float k)
+    {
+        float res = 1;
+        float t = 0;
+        for (int i = 0; i < MaxSteps && t<tMax; i++)
+        {
+            float h = SceneSdf(rayOrigin + rayDir * t);
+            if (h < 0.001f)
+            {
+                return 0;
+            }
+            res = MathF.Min(res, k * h / t);
+            t += h;
+        }
+        
+        return res;
+    }
+
+    #endregion
 }

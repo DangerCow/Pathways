@@ -6,6 +6,7 @@ public class Scene
 {
     public Camera Camera = new Camera();
     public List<PathwayObject> Objects = new List<PathwayObject>();
+    public List<PathwayLight> Lights = new List<PathwayLight>();
 
     public virtual void Init()
     {
@@ -55,5 +56,17 @@ public class Scene
         }
 
         return objects;
+    }
+    
+    public PathwayLight.ShaderRepresentation[] GetLightsShaderRepresentation()
+    {
+        var lights = new PathwayLight.ShaderRepresentation[Lights.Count];
+        
+        foreach (var light in Lights)
+        {
+            lights[Lights.IndexOf(light)] = light.GetShaderRepresentation();
+        }
+
+        return lights;
     }
 }

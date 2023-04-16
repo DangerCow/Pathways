@@ -22,7 +22,7 @@ public class PathwayShaderManager
 
     internal RenderTexture2D Render(Scene scene)
     {
-        if (scene == null || scene.Objects.Count == 0)
+        if (scene == null || scene.Objects.Count == 0 || scene.Lights.Count == 0 || ShaderBuffer == null)
             return TargetTexture;
         
         //get objects
@@ -30,6 +30,12 @@ public class PathwayShaderManager
         ReadWriteBuffer<PathwayObject.ShaderRepresentation> objectsBuffer = GraphicsDevice.GetDefault()
             .AllocateReadWriteBuffer<PathwayObject.ShaderRepresentation>(objects.Length);
         objectsBuffer.CopyFrom(objects);
+        
+        //get lights
+        var lights = scene.GetLightsShaderRepresentation();
+        ReadWriteBuffer<PathwayLight.ShaderRepresentation> lightsBuffer = GraphicsDevice.GetDefault()
+            .AllocateReadWriteBuffer<PathwayLight.ShaderRepresentation>(lights.Length);
+        lightsBuffer.CopyFrom(lights);
 
         //get the camera
         var camera = scene.Camera.GetShaderRepresentation();
@@ -40,6 +46,7 @@ public class PathwayShaderManager
                 TargetTexture.texture.width,
                 TargetTexture.texture.height,
                 objectsBuffer,
+                lightsBuffer,
                 camera));
 
         unsafe
