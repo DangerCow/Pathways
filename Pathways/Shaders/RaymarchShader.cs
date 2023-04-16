@@ -101,14 +101,27 @@ public readonly partial struct RaymarchShader : IComputeShader
         for (int i = 0; i < Lights.Length; i++)
         {
             LightSource.ShaderRepresentation light = Lights[i];
+
+            Vector3 shadowRayOrigin;
+            Vector3 shadowRayDir;
             
             switch (light.Type)
             {
                 case 0:
                     lightAccum += LightAccumPoint(point, normal, color, light);
+                    
+                    shadowRayDir = light.Position - point;
+                    shadowRayDir = ShaderRotationMethods.Normalize(shadowRayDir);
+                    shadowRayOrigin = point + normal * 0.001f;
+                    lightAccum *= Shadow(shadowRayOrigin, shadowRayDir, 100, 64);
                     break;
                 case 1:
-                    lightAccum += LightAccumDirectional(point, normal, color, light);
+                    lightAccum += LightAccumDirectional(point + normal * 0.001f, normal , color, light);
+                    
+                    shadowRayDir = new Vector3(0, 0, 1);
+                    shadowRayDir = ShaderRotationMethods.Transform(shadowRayDir, light.Rotation);
+                    shadowRayOrigin = point + normal * 0.001f;
+                    lightAccum *= Shadow(shadowRayOrigin, shadowRayDir, 100, 64);
                     break;
             }
         }
@@ -144,7 +157,7 @@ public readonly partial struct RaymarchShader : IComputeShader
         float diffuse = MathF.Max(0, Vector3.Dot(normal, lightDir));
         
         lightAccum += colorVec * light.Color * diffuse * light.Intensity;
-        
+
         return lightAccum;
     }
     
@@ -168,7 +181,52 @@ public readonly partial struct RaymarchShader : IComputeShader
         return lightAccum;
     }
     
+    private float Shadow(Vector3 rayOrigin, Vector3 rayDir, float tMax, float k)
+    {
+        float res = 1;
+        float t = 0;
+        int maxIterations = 128;
+        for (int i = 0; i < maxIterations && t<tMax; i++)
+        {
+            float h = GetDistScene(rayOrigin + rayDir * t);
+            if (h < 0.001f)
+            {
+                return 0;
+            }
+            res = MathF.Min(res, k * h / t);
+            t += h;
+        }
+        
+        return res;
+    }
+    
     // SDF functions
+    
+    private float GetDistScene(Vector3 point)
+    {
+        float minDistance = float.MaxValue;
+
+        for (int i = 0; i < Objects.Length; i++)
+        {
+            GameObject.ShaderRepresentation obj = Objects[i];
+            int sdfType = obj.SdfType;
+
+            float distance = GetDist(point, obj.Position, obj.Scale, obj.Rotation, sdfType);
+            
+            // dont allow negative distances
+            if (distance < 0)
+            {
+                distance = float.MaxValue;
+            }
+
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+            }
+        }
+
+        return minDistance;
+    }
 
     private float GetDist(Vector3 point, Vector3 center, Vector3 size, Vector4 rotation, int sdfType)
     {

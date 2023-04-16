@@ -22,7 +22,13 @@ public static class Program
             Sun.Color = Color.WHITE;
             Sun.Rotation = new Rotation(new Vector3(-70, 15, 0));
             Sun.Type = LightSource.LightType.Directional;
-            AddLightSource(Sun);
+            //AddLightSource(Sun);
+            
+            LightSource PointLight = new LightSource();
+            PointLight.Position = new Vector3(2, 5, 2);
+            PointLight.Color = Color.SKYBLUE;
+            PointLight.Type = LightSource.LightType.Point;
+            AddLightSource(PointLight);
 
             GameObject sphere = new BouncySphere();
             sphere.Position = new Vector3(1.5f, 2, 0);
