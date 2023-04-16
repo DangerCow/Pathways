@@ -100,7 +100,7 @@ public class Window
 
         DrawRaymarchShader();
         Scene.DoDraw();
-        
+
         Raylib.EndDrawing();
     }
 
@@ -120,16 +120,21 @@ public class Window
 
     private void DrawRaymarchShader()
     {
-        if (Scene == null || Scene.GetShaderRepresentations() == null || Scene.GetShaderRepresentations().Length == 0)
+        if (Scene == null || Scene.GetObjectsShaderRepresentation() == null ||
+            Scene.GetObjectsShaderRepresentation().Length == 0)
             return;
 
-        GameObject.ShaderRepresentation[] shaderRepresentations = Scene.GetShaderRepresentations();
-        ReadWriteBuffer<GameObject.ShaderRepresentation> shaderRepresentationBuffer =
-            GraphicsDevice.GetDefault().AllocateReadWriteBuffer(shaderRepresentations);
+        GameObject.ShaderRepresentation[] objectsShaderRepresentation = Scene.GetObjectsShaderRepresentation();
+        ReadWriteBuffer<GameObject.ShaderRepresentation> objectsShaderRepresentationBuffer =
+            GraphicsDevice.GetDefault().AllocateReadWriteBuffer(objectsShaderRepresentation);
+
+        LightSource.ShaderRepresentation[] lightsShaderRepresentation = Scene.GetLightSourcesShaderRepresentation();
+        ReadWriteBuffer<LightSource.ShaderRepresentation> lightsShaderRepresentationBuffer =
+            GraphicsDevice.GetDefault().AllocateReadWriteBuffer(lightsShaderRepresentation);
 
         GraphicsDevice.GetDefault().For(_outputBuffer.Length,
-            new RaymarchShader(_outputBuffer, Width, Height, shaderRepresentationBuffer,
-                Scene.SceneCamera.GetShaderRepresentation()));
+            new RaymarchShader(_outputBuffer, Width, Height, objectsShaderRepresentationBuffer,
+                lightsShaderRepresentationBuffer, Scene.SceneCamera.GetShaderRepresentation()));
         Vector4[] data = _outputBuffer.ToArray();
 
         // Copy the buffer to a color buffer

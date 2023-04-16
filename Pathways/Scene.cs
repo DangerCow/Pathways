@@ -6,11 +6,16 @@ namespace Pathways;
 public class Scene
 {
     public List<GameObject> GameObjects = new();
+    public List<LightSource> LightSources = new();
     public Camera SceneCamera = new Camera();
 
     public void AddGameObject(GameObject gameObject)
     {
         GameObjects.Add(gameObject);
+    }
+    public void AddLightSource(LightSource lightSource)
+    {
+        LightSources.Add(lightSource);
     }
     
     public virtual void Init()
@@ -52,13 +57,25 @@ public class Scene
         
     }
 
-    public GameObject.ShaderRepresentation[] GetShaderRepresentations()
+    public GameObject.ShaderRepresentation[] GetObjectsShaderRepresentation()
     {
         GameObject.ShaderRepresentation[]
             shaderRepresentations = new GameObject.ShaderRepresentation[GameObjects.Count];
         for (int i = 0; i < GameObjects.Count; i++)
         {
             shaderRepresentations[i] = GameObjects[i].GetShaderRepresentation();
+        }
+
+        return shaderRepresentations;
+    }
+    
+    public LightSource.ShaderRepresentation[] GetLightSourcesShaderRepresentation()
+    {
+        LightSource.ShaderRepresentation[]
+            shaderRepresentations = new LightSource.ShaderRepresentation[LightSources.Count];
+        for (int i = 0; i < LightSources.Count; i++)
+        {
+            shaderRepresentations[i] = LightSources[i].GetShaderRepresentation();
         }
 
         return shaderRepresentations;

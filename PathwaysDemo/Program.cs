@@ -17,6 +17,13 @@ public static class Program
             SceneCamera.Position = new Vector3(0, 4, 10);
             SceneCamera.Rotation = new Rotation(new Vector3(-30, 0, 0));
 
+            LightSource Sun = new LightSource();
+            Sun.Position = new Vector3(0, 10, 0);
+            Sun.Color = Color.WHITE;
+            Sun.Rotation = new Rotation(new Vector3(-70, 15, 0));
+            Sun.Type = LightSource.LightType.Directional;
+            AddLightSource(Sun);
+
             GameObject sphere = new BouncySphere();
             sphere.Position = new Vector3(1.5f, 2, 0);
             AddGameObject(sphere);

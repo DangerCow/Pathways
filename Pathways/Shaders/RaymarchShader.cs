@@ -13,6 +13,7 @@ public readonly partial struct RaymarchShader : IComputeShader
     public readonly int Height;
 
     public readonly ReadWriteBuffer<GameObject.ShaderRepresentation> Objects;
+    public readonly ReadWriteBuffer<LightSource.ShaderRepresentation> Lights;
     public readonly Camera.ShaderRepresentation Camera;
 
     public void Execute()
@@ -59,20 +60,7 @@ public readonly partial struct RaymarchShader : IComputeShader
                 GameObject.ShaderRepresentation obj = Objects[j];
                 int sdfType = obj.SdfType;
 
-                float distance = 0;
-
-                switch (sdfType)
-                {
-                    case 0:
-                        distance = SphereSdf(point, obj.Position, obj.Scale.X);
-                        break;
-                    case 1:
-                        distance = BoxSdf(point, obj.Position, obj.Scale, obj.Rotation);
-                        break;
-                    case 2:
-                        distance = PlaneSdf(point, obj.Position, obj.Scale, obj.Rotation);
-                        break;
-                }
+                float distance = GetDist(point, obj.Position, obj.Scale, obj.Rotation, sdfType);
                 
                 // dont allow negative distances
                 if (distance < 0)
@@ -93,7 +81,9 @@ public readonly partial struct RaymarchShader : IComputeShader
 
                     if (distance < 0.001f)
                     {
-                        return hitColor;
+                        // we hit something
+                        Vector3 normal = GetNormal(point, obj.Position, obj.Scale, obj.Rotation, sdfType);
+                        return Shade(point, normal, hitColor);
                     }
                 }
             }
@@ -104,7 +94,96 @@ public readonly partial struct RaymarchShader : IComputeShader
         return new Vector4(t, t, t, 1);
     }
     
+    private Vector4 Shade(Vector3 point, Vector3 normal, Vector4 color)
+    {
+        Vector3 lightAccum = new Vector3(0, 0, 0);
+        
+        for (int i = 0; i < Lights.Length; i++)
+        {
+            LightSource.ShaderRepresentation light = Lights[i];
+            
+            switch (light.Type)
+            {
+                case 0:
+                    lightAccum += LightAccumPoint(point, normal, color, light);
+                    break;
+                case 1:
+                    lightAccum += LightAccumDirectional(point, normal, color, light);
+                    break;
+            }
+        }
+        
+        Vector3 colorVec = new Vector3();
+        colorVec.X = color.X;
+        colorVec.Y = color.Y;
+        colorVec.Z = color.Z;
+        
+        // ambient light
+        lightAccum += colorVec * 0.1f;
+        
+        Vector4 finalColor = new Vector4();
+        finalColor.X = lightAccum.X;
+        finalColor.Y = lightAccum.Y;
+        finalColor.Z = lightAccum.Z;
+        finalColor.W = 1;
+        
+        return finalColor;
+    }
+    
+    private Vector3 LightAccumPoint(Vector3 point, Vector3 normal, Vector4 color, LightSource.ShaderRepresentation light)
+    {
+        Vector3 lightAccum = new Vector3(0, 0, 0);
+        Vector3 colorVec = new Vector3();
+        colorVec.X = color.X;
+        colorVec.Y = color.Y;
+        colorVec.Z = color.Z;
+        
+        Vector3 lightDir = light.Position - point;
+        lightDir = ShaderRotationMethods.Normalize(lightDir);
+        
+        float diffuse = MathF.Max(0, Vector3.Dot(normal, lightDir));
+        
+        lightAccum += colorVec * light.Color * diffuse * light.Intensity;
+        
+        return lightAccum;
+    }
+    
+    private Vector3 LightAccumDirectional(Vector3 point, Vector3 normal, Vector4 color, LightSource.ShaderRepresentation light)
+    {
+        Vector3 lightAccum = new Vector3(0, 0, 0);
+        Vector3 colorVec = new Vector3();
+        colorVec.X = color.X;
+        colorVec.Y = color.Y;
+        colorVec.Z = color.Z;
+        
+        Vector4 lightRot = light.Rotation;
+        
+        Vector3 lightDir = new Vector3(0, 0, 1);
+        lightDir = ShaderRotationMethods.Transform(lightDir, lightRot);
+        
+        float diffuse = MathF.Max(0, Vector3.Dot(normal, lightDir));
+        
+        lightAccum += colorVec * light.Color * diffuse * light.Intensity;
+        
+        return lightAccum;
+    }
+    
     // SDF functions
+
+    private float GetDist(Vector3 point, Vector3 center, Vector3 size, Vector4 rotation, int sdfType)
+    {
+        switch (sdfType)
+        {
+            case 0:
+                return SphereSdf(point, center, size.X);
+            case 1:
+                return BoxSdf(point, center, size, rotation);
+            case 2:
+                return PlaneSdf(point, center, size, rotation);
+        }
+
+        return 0;
+    }
     
     private float SphereSdf(Vector3 point, Vector3 center, float radius)
     {
@@ -119,16 +198,14 @@ public readonly partial struct RaymarchShader : IComputeShader
         
         // translate the point
         point -= center;
-        
-        //fix the world being surrounded by this box
-        if (!(point.X < -size.X || point.X > size.X || point.Y < -size.Y || point.Y > size.Y || point.Z < -size.Z || point.Z > size.Z))
-        {
-            return float.MaxValue;
-        }
 
         // get the distance from the point to the box
-        Vector3 d = Abs(point) - size;
-        return MathF.Min(MathF.Max(d.X, MathF.Max(d.Y, d.Z)), 0.0f) + Length(Vector3.Max(d, Vector3.Zero));
+        Vector3 q = Abs(point) - size;
+        float d = Length(Max(q, new Vector3(0, 0, 0))) + MathF.Min(MathF.Max(q.X, MathF.Max(q.Y, q.Z)), 0);
+        
+        // smooth the edges
+        float k = 0.01f;
+        return d - k;
     }
     
     private float PlaneSdf(Vector3 point, Vector3 center, Vector3 size, Vector4 rotation)
@@ -151,8 +228,49 @@ public readonly partial struct RaymarchShader : IComputeShader
         Vector3 d = Abs(point - center) - size;
         return MathF.Min(MathF.Max(d.X, MathF.Max(d.Y, d.Z)), 0.0f) + Length(Vector3.Max(d, Vector3.Zero));
     }
+
+    private Vector3 GetNormal(Vector3 point, Vector3 center, Vector3 size, Vector4 rotation, int sdfType)
+    {
+        float h = 0.001f;
+        Vector2 k = new Vector2(1, -1);
+        Vector3 normal = new Vector3();
+        
+        Vector3 kxyy = new Vector3(k.X, k.Y, k.Y);
+        Vector3 kyyx = new Vector3(k.Y, k.Y, k.X);
+        Vector3 kyxy = new Vector3(k.Y, k.X, k.Y);
+        Vector3 kxxx = new Vector3(k.X, k.X, k.X);
+        
+        normal += kxyy * GetDist(point + kxyy * h, center, size, rotation, sdfType);
+        normal += kyyx * GetDist(point + kyyx * h, center, size, rotation, sdfType);
+        normal += kyxy * GetDist(point + kyxy * h, center, size, rotation, sdfType);
+        normal += kxxx * GetDist(point + kxxx * h, center, size, rotation, sdfType);
+        
+        // fix box normals
+        
+        
+        return ShaderRotationMethods.Normalize(normal);
+    }
     
     // utility functions
+    
+    [ShaderMethod]
+    private static Vector3 Clamp(Vector3 x, Vector3 min, Vector3 max)
+    {
+        return new Vector3(Math.Clamp(x.X, min.X, max.X), Math.Clamp(x.Y, min.Y, max.Y), Math.Clamp(x.Z, min.Z, max.Z));
+    }
+    
+    [ShaderMethod]
+    private static Vector3 Smoothstep(Vector3 edge0, Vector3 edge1, Vector3 x)
+    {
+        Vector3 t = Clamp((x - edge0) / (edge1 - edge0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+        return t * t * (new Vector3(3, 3, 3) - new Vector3(2, 2, 2) * t);
+    }
+    
+    [ShaderMethod]
+    private static Vector3 MulByScalar(Vector3 v, float s)
+    {
+        return new Vector3(v.X * s, v.Y * s, v.Z * s);
+    }
     
     [ShaderMethod]
     private static Vector3 Abs(Vector3 v)
