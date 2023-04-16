@@ -68,8 +68,11 @@ public class Pathway
             Draw();
         }
     }
-    
-    public virtual void Update(){}
+
+    public virtual void Update()
+    {
+        Scene.Update();
+    }
 
     public virtual void Draw()
     {
@@ -77,6 +80,8 @@ public class Pathway
         Raylib.ClearBackground(Color.BLACK);
         
         Raylib.DrawTexture(ShaderManager.Render(_scene).texture, 0, 0, Color.WHITE);
+        
+        Scene.DoDraw();
         
         // TODO: Remove debug fps indicator
         Raylib.DrawFPS(10, 10);

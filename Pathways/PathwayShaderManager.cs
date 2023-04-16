@@ -22,8 +22,25 @@ public class PathwayShaderManager
 
     internal RenderTexture2D Render(Scene scene)
     {
+        if (scene == null || scene.Objects.Count == 0)
+            return TargetTexture;
+        
+        //get objects
+        var objects = scene.GetObjectsShaderRepresentation();
+        ReadWriteBuffer<PathwayObject.ShaderRepresentation> objectsBuffer = GraphicsDevice.GetDefault()
+            .AllocateReadWriteBuffer<PathwayObject.ShaderRepresentation>(objects.Length);
+        objectsBuffer.CopyFrom(objects);
+
+        //get the camera
+        var camera = scene.Camera.GetShaderRepresentation();
+
         GraphicsDevice.GetDefault().For(ShaderBuffer.Length,
-            new RayMarchSahder(ShaderBuffer, TargetTexture.texture.width, TargetTexture.texture.height));
+            new RayMarchShader(
+                ShaderBuffer,
+                TargetTexture.texture.width,
+                TargetTexture.texture.height,
+                objectsBuffer,
+                camera));
 
         unsafe
         {
@@ -32,7 +49,7 @@ public class PathwayShaderManager
                 Raylib.UpdateTexture(TargetTexture.texture, ptr);
             }
         }
-        
+
         return TargetTexture;
     }
 }
