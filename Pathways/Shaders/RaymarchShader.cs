@@ -15,6 +15,8 @@ public readonly partial struct RaymarchShader : IComputeShader
     public readonly ReadWriteBuffer<GameObject.ShaderRepresentation> Objects;
     public readonly ReadWriteBuffer<LightSource.ShaderRepresentation> Lights;
     public readonly Camera.ShaderRepresentation Camera;
+    
+    private const int MaxIterations = 512;
 
     public void Execute()
     {
@@ -47,9 +49,8 @@ public readonly partial struct RaymarchShader : IComputeShader
 
         float t = 0;
         float tMax = 100;
-        int maxIterations = 128;
 
-        for (int i = 0; i < maxIterations; i++)
+        for (int i = 0; i < MaxIterations; i++)
         {
             Vector3 point = rayOrigin + rayDir * t;
 
@@ -104,24 +105,29 @@ public readonly partial struct RaymarchShader : IComputeShader
 
             Vector3 shadowRayOrigin;
             Vector3 shadowRayDir;
+            Vector3 lightAccumTemp;
             
             switch (light.Type)
             {
                 case 0:
-                    lightAccum += LightAccumPoint(point, normal, color, light);
+                    lightAccumTemp = LightAccumPoint(point, normal, color, light);
                     
                     shadowRayDir = light.Position - point;
                     shadowRayDir = ShaderRotationMethods.Normalize(shadowRayDir);
                     shadowRayOrigin = point + normal * 0.001f;
-                    lightAccum *= Shadow(shadowRayOrigin, shadowRayDir, 100, 64);
+                    lightAccumTemp *= Shadow(shadowRayOrigin, shadowRayDir, 100, 64);
+                    
+                    lightAccum += lightAccumTemp;
                     break;
                 case 1:
-                    lightAccum += LightAccumDirectional(point + normal * 0.001f, normal , color, light);
+                    lightAccumTemp = LightAccumDirectional(point + normal * 0.001f, normal , color, light);
                     
                     shadowRayDir = new Vector3(0, 0, 1);
                     shadowRayDir = ShaderRotationMethods.Transform(shadowRayDir, light.Rotation);
                     shadowRayOrigin = point + normal * 0.001f;
-                    lightAccum *= Shadow(shadowRayOrigin, shadowRayDir, 100, 64);
+                    lightAccumTemp *= Shadow(shadowRayOrigin, shadowRayDir, 100, 16);
+                    
+                    lightAccum += lightAccumTemp;
                     break;
             }
         }
@@ -185,8 +191,7 @@ public readonly partial struct RaymarchShader : IComputeShader
     {
         float res = 1;
         float t = 0;
-        int maxIterations = 128;
-        for (int i = 0; i < maxIterations && t<tMax; i++)
+        for (int i = 0; i < MaxIterations && t<tMax; i++)
         {
             float h = GetDistScene(rayOrigin + rayDir * t);
             if (h < 0.001f)

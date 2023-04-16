@@ -26,9 +26,21 @@ public static class Program
             
             LightSource PointLight = new LightSource();
             PointLight.Position = new Vector3(2, 5, 2);
-            PointLight.Color = Color.SKYBLUE;
+            PointLight.Color = Color.BLUE;
             PointLight.Type = LightSource.LightType.Point;
             AddLightSource(PointLight);
+            
+            LightSource PointLight2 = new LightSource();
+            PointLight2.Position = new Vector3(-2, 5, 2);
+            PointLight2.Color = Color.RED;
+            PointLight2.Type = LightSource.LightType.Point;
+            AddLightSource(PointLight2);
+            
+            LightSource PointLight3 = new LightSource();
+            PointLight3.Position = new Vector3(2, 5, -2);
+            PointLight3.Color = Color.GREEN;
+            PointLight3.Type = LightSource.LightType.Point;
+            AddLightSource(PointLight3);
 
             GameObject sphere = new BouncySphere();
             sphere.Position = new Vector3(1.5f, 2, 0);
@@ -66,7 +78,7 @@ public static class Program
     {
         Scene demoScene = new DemoScene();
 
-        Window window = new(960, 720, "Pathways Demo", demoScene);
+        Window window = new(1280, 720, "Pathways Demo", demoScene);
         window.StartGameLoop();
     }
 }
