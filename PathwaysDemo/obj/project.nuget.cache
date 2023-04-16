@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "68cos3+ZtO3tlXLliXRIJENQdYvP9cBO9/X8TJ7UCK7aEMAsuMnzu0/6MMxoirdB2T+4sekyutiPoX/KwcUczA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Gameing\\Nextcloud\\ProjectFiles\\Programming\\Pathways\\PathwaysDemo\\PathwaysDemo.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Gameing\\.nuget\\packages\\communitytoolkit.diagnostics\\8.0.0\\communitytoolkit.diagnostics.8.0.0.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\computesharp\\2.0.3\\computesharp.2.0.3.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\computesharp.core\\2.0.3\\computesharp.core.2.0.3.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\raylib-cs\\4.5.0\\raylib-cs.4.5.0.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\terrafx.interop.d3d12memoryallocator\\2.0.1.2\\terrafx.interop.d3d12memoryallocator.2.0.1.2.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\terrafx.interop.windows\\10.0.20348.5\\terrafx.interop.windows.10.0.20348.5.nupkg.sha512"
+  ],
+  "logs": []
+}
