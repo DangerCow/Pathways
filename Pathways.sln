@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pathways", "Pathways\Pathways.csproj", "{D82DD955-99FF-40AE-90DB-1A6406B4A564}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PathwaysDemo", "PathwaysDemo\PathwaysDemo.csproj", "{6349394D-5FF9-494D-B26B-C4950C081F50}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D82DD955-99FF-40AE-90DB-1A6406B4A564}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D82DD955-99FF-40AE-90DB-1A6406B4A564}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D82DD955-99FF-40AE-90DB-1A6406B4A564}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D82DD955-99FF-40AE-90DB-1A6406B4A564}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6349394D-5FF9-494D-B26B-C4950C081F50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6349394D-5FF9-494D-B26B-C4950C081F50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6349394D-5FF9-494D-B26B-C4950C081F50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6349394D-5FF9-494D-B26B-C4950C081F50}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

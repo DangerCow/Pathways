@@ -9,6 +9,7 @@
       "Pathways/1.0.0": {
         "dependencies": {
           "ComputeSharp": "2.0.3",
+          "ComputeSharp.Dynamic": "2.0.3",
           "Raylib-cs": "4.5.0"
         },
         "runtime": {
@@ -41,6 +42,40 @@
           "lib/net6.0/ComputeSharp.Core.dll": {
             "assemblyVersion": "2.0.3.0",
             "fileVersion": "2.0.3.0"
+          }
+        }
+      },
+      "ComputeSharp.Dynamic/2.0.3": {
+        "dependencies": {
+          "ComputeSharp": "2.0.3",
+          "ComputeSharp.Core": "2.0.3"
+        },
+        "runtime": {
+          "lib/net6.0/ComputeSharp.Dynamic.dll": {
+            "assemblyVersion": "2.0.3.0",
+            "fileVersion": "2.0.3.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win-arm64/native/dxcompiler.dll": {
+            "rid": "win-arm64",
+            "assetType": "native",
+            "fileVersion": "1.7.2207.3"
+          },
+          "runtimes/win-arm64/native/dxil.dll": {
+            "rid": "win-arm64",
+            "assetType": "native",
+            "fileVersion": "101.7.2207.10"
+          },
+          "runtimes/win-x64/native/dxcompiler.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "1.7.2207.3"
+          },
+          "runtimes/win-x64/native/dxil.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "101.7.2207.10"
           }
         }
       },
@@ -130,6 +165,13 @@
       "sha512": "sha512-p0ZrdwrrT346pb+q52YF2Me2eVdzCEDpi/7wqA1nhRfeW4y0FYR+iPIIkOAns3x7fdknaIbXrpyWcKNfe3qMQA==",
       "path": "computesharp.core/2.0.3",
       "hashPath": "computesharp.core.2.0.3.nupkg.sha512"
+    },
+    "ComputeSharp.Dynamic/2.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-vHsVJSpeciVNyNYG4K/RXNUoPshfOR4BRVQf1u28W5vSW1l2NNoElZZoisAYUau2z2nRV73uinR/26Z0mqjm6A==",
+      "path": "computesharp.dynamic/2.0.3",
+      "hashPath": "computesharp.dynamic.2.0.3.nupkg.sha512"
     },
     "Raylib-cs/4.5.0": {
       "type": "package",

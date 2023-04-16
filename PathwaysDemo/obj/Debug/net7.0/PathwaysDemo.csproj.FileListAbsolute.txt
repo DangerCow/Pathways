@@ -27,3 +27,8 @@ C:\Users\Gameing\Nextcloud\ProjectFiles\Programming\Pathways\PathwaysDemo\obj\De
 C:\Users\Gameing\Nextcloud\ProjectFiles\Programming\Pathways\PathwaysDemo\obj\Debug\net7.0\PathwaysDemo.pdb
 C:\Users\Gameing\Nextcloud\ProjectFiles\Programming\Pathways\PathwaysDemo\obj\Debug\net7.0\PathwaysDemo.genruntimeconfig.cache
 C:\Users\Gameing\Nextcloud\ProjectFiles\Programming\Pathways\PathwaysDemo\obj\Debug\net7.0\ref\PathwaysDemo.dll
+C:\Users\Gameing\Nextcloud\ProjectFiles\Programming\Pathways\PathwaysDemo\bin\Debug\net7.0\ComputeSharp.Dynamic.dll
+C:\Users\Gameing\Nextcloud\ProjectFiles\Programming\Pathways\PathwaysDemo\bin\Debug\net7.0\runtimes\win-arm64\native\dxcompiler.dll
+C:\Users\Gameing\Nextcloud\ProjectFiles\Programming\Pathways\PathwaysDemo\bin\Debug\net7.0\runtimes\win-arm64\native\dxil.dll
+C:\Users\Gameing\Nextcloud\ProjectFiles\Programming\Pathways\PathwaysDemo\bin\Debug\net7.0\runtimes\win-x64\native\dxcompiler.dll
+C:\Users\Gameing\Nextcloud\ProjectFiles\Programming\Pathways\PathwaysDemo\bin\Debug\net7.0\runtimes\win-x64\native\dxil.dll

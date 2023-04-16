@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Tlt3lVZ9rLEisgIfZaiRhbzGNT4+36AAMBUA1hyfOezNFfhnETpKC9HBAINjOGutnhxY2WVPUTUcL/gcqx3+eg==",
+  "dgSpecHash": "BIbUs9rrdOVMt97PCTKFwF1P2VwQM6RxLx3K2KF+1RrfEG37uuSeVi29UG6nrCZQLWlHDFDneS2V0ni+OenF3g==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Gameing\\Nextcloud\\ProjectFiles\\Programming\\Pathways\\PathwaysDemo\\PathwaysDemo.csproj",
+  "projectFilePath": "C:\\Users\\Gameing\\Nextcloud\\ProjectFiles\\Programming\\Pathways\\Pathways\\Pathways.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Gameing\\.nuget\\packages\\communitytoolkit.diagnostics\\8.0.0\\communitytoolkit.diagnostics.8.0.0.nupkg.sha512",
     "C:\\Users\\Gameing\\.nuget\\packages\\computesharp\\2.0.3\\computesharp.2.0.3.nupkg.sha512",
