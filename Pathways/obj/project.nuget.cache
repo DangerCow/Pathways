@@ -1,8 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "/gsxSpA6cWNsnSSRNXW1NvyVtQoqb8FWWMCf2leXah+uyV7yVNlIT1pDQHpvCBWCuUA/mNJwBcIzn+H9jr0wqQ==",
+  "dgSpecHash": "BIbUs9rrdOVMt97PCTKFwF1P2VwQM6RxLx3K2KF+1RrfEG37uuSeVi29UG6nrCZQLWlHDFDneS2V0ni+OenF3g==",
   "success": true,
   "projectFilePath": "C:\\Users\\Gameing\\Nextcloud\\ProjectFiles\\Programming\\Pathways\\Pathways\\Pathways.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Gameing\\.nuget\\packages\\communitytoolkit.diagnostics\\8.0.0\\communitytoolkit.diagnostics.8.0.0.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\computesharp\\2.0.3\\computesharp.2.0.3.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\computesharp.core\\2.0.3\\computesharp.core.2.0.3.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\computesharp.dynamic\\2.0.3\\computesharp.dynamic.2.0.3.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\raylib-cs\\4.5.0\\raylib-cs.4.5.0.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\terrafx.interop.d3d12memoryallocator\\2.0.1.2\\terrafx.interop.d3d12memoryallocator.2.0.1.2.nupkg.sha512",
+    "C:\\Users\\Gameing\\.nuget\\packages\\terrafx.interop.windows\\10.0.20348.5\\terrafx.interop.windows.10.0.20348.5.nupkg.sha512"
+  ],
   "logs": []
 }
