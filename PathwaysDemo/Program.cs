@@ -32,19 +32,10 @@ public class DemoScene : Scene
         sphere.Smoothness = 1f;
         sphere.Type = PathwayObject.ObjectType.Sphere;
         
-        PathwayObject sphere2 = new PathwayObject();
-        sphere2.Position = new Vector3(0, 5, 0);
-        sphere2.Rotation = new Rotation(new Vector3(0, 0, 0));
-        sphere2.Scale = new Vector3(1, 1, 1);
-        sphere2.Color = Color.YELLOW;
-        sphere2.Smoothness = 0.1f;
-        sphere2.Type = PathwayObject.ObjectType.Sphere;
-        
         
         Objects.Add(cube);
         Objects.Add(plane);
         Objects.Add(sphere);
-        Objects.Add(sphere2);
         
         PathwayLight light = new PathwayLight();
         light.Position = new Vector3(2, 8, 8);

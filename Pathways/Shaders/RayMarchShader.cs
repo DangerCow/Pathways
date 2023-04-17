@@ -280,7 +280,7 @@ public readonly partial struct RayMarchShader : IComputeShader
         viewDir = ShaderMath.Normalize(viewDir);
         Vector3 halfwayDir = ShaderMath.Normalize(lightDir + viewDir);
         
-        float specular = MathF.Pow(MathF.Max(0, Vector3.Dot(normal, halfwayDir)), obj.Smoothness * 64f);
+        float specular = MathF.Pow(MathF.Max(0, Vector3.Dot(normal, halfwayDir)), obj.Smoothness * 128f);
         
         lightAccum += obj.Color * light.Color * (diffuse + specular * obj.Smoothness) * light.Intensity;
 
@@ -304,7 +304,7 @@ public readonly partial struct RayMarchShader : IComputeShader
         viewDir = ShaderMath.Normalize(viewDir);
         Vector3 halfwayDir = ShaderMath.Normalize(lightDir + viewDir);
         
-        float specular = MathF.Pow(MathF.Max(0, Vector3.Dot(normal, halfwayDir)), obj.Smoothness * 64f);
+        float specular = MathF.Pow(MathF.Max(0, Vector3.Dot(normal, halfwayDir)), obj.Smoothness * 128f);
         
         lightAccum += obj.Color * light.Color * (diffuse + specular * obj.Smoothness) * light.Intensity;
         
