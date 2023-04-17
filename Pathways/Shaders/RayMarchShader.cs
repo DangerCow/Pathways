@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
 using ComputeSharp;
 
 namespace Pathways.Shaders;
@@ -43,6 +44,8 @@ public readonly partial struct RayMarchShader : IComputeShader
 
 
         Vector3 outColor = RayMarch(rayOrigin, rayDir);
+        
+        outColor = SmoothClampColor(outColor);
 
         int outR = (int)Math.Clamp(outColor.X * 255, 0, 255);
         int outG = (int)Math.Clamp(outColor.Y * 255, 0, 255);
@@ -165,7 +168,7 @@ public readonly partial struct RayMarchShader : IComputeShader
                   MathF.Min(MathF.Max(q.X, MathF.Max(q.Y, q.Z)), 0);
 
         // smooth the edges
-        float k = 0.01f;
+        float k = 0.1f;
         return d - k;
     }
 
@@ -324,6 +327,20 @@ public readonly partial struct RayMarchShader : IComputeShader
         }
         
         return res;
+    }
+
+    public Vector3 SmoothClampColor(Vector3 color)
+    {
+        float a = 3f;
+        
+        float r = 1 / (1 + MathF.Exp(-a * color.X));
+        r = r * 2 - 1;
+        float g = 1 / (1 + MathF.Exp(-a * color.Y));
+        g = g * 2 - 1;
+        float b = 1 / (1 + MathF.Exp(-a * color.Z));
+        b = b * 2 - 1;
+        
+        return new Vector3(r, g, b);
     }
 
     #endregion

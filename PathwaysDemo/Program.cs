@@ -8,7 +8,7 @@ public class DemoScene : Scene
 {
     public override void Init()
     {
-        Camera = new Camera(new Vector3(0, 6, 10), new Rotation(new Vector3(-30, 0, 0)), 90);
+        Camera = new Camera(new Vector3(0, 6, 10), new Rotation(new Vector3(-30, 0, 0)), 60);
 
         PathwayObject cube = new PathwayObject();
         cube.Position = new Vector3(0, 1, 0);
@@ -32,19 +32,19 @@ public class DemoScene : Scene
         sphere.Smoothness = 1f;
         sphere.Type = PathwayObject.ObjectType.Sphere;
         
-        PathwayObject Sphere2 = new PathwayObject();
-        Sphere2.Position = new Vector3(0, 5, 0);
-        Sphere2.Rotation = new Rotation(new Vector3(0, 0, 0));
-        Sphere2.Scale = new Vector3(1, 1, 1);
-        Sphere2.Color = Color.YELLOW;
-        Sphere2.Smoothness = 0.1f;
-        Sphere2.Type = PathwayObject.ObjectType.Sphere;
+        PathwayObject sphere2 = new PathwayObject();
+        sphere2.Position = new Vector3(0, 5, 0);
+        sphere2.Rotation = new Rotation(new Vector3(0, 0, 0));
+        sphere2.Scale = new Vector3(1, 1, 1);
+        sphere2.Color = Color.YELLOW;
+        sphere2.Smoothness = 0.1f;
+        sphere2.Type = PathwayObject.ObjectType.Sphere;
         
         
         Objects.Add(cube);
         Objects.Add(plane);
         Objects.Add(sphere);
-        Objects.Add(Sphere2);
+        Objects.Add(sphere2);
         
         PathwayLight light = new PathwayLight();
         light.Position = new Vector3(2, 8, 8);
