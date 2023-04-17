@@ -7,7 +7,7 @@ namespace Pathways.Shaders;
 [AutoConstructor]
 public readonly partial struct RayMarchShader : IComputeShader
 {
-    public const int MaxSteps = 256;
+    public const int MaxSteps = 128;
 
     public readonly ReadWriteBuffer<int> Buffer;
     public readonly int Width;
@@ -66,6 +66,8 @@ public readonly partial struct RayMarchShader : IComputeShader
 
         float t = 0;
         float tMax = 1000;
+        
+        int checks = 0;
 
         for (int i = 0; i < MaxSteps; i++)
         {
@@ -78,8 +80,17 @@ public readonly partial struct RayMarchShader : IComputeShader
             for (int j = 0; j < Objects.Length; j++)
             {
                 var obj = Objects[j];
+                
+                // check if the ray intersects the bounding box
+                if(!obj.BoundingBox.RayIntersects(rayOrigin, rayDirection))
+                {
+                    continue;
+                }
+                
                 float objDistance = ObjectSdf(point, Objects[j]);
                 distance = MathF.Min(distance, objDistance);
+                
+                checks++;
 
                 // dont allow negative distances
                 if (distance < 0)
@@ -95,7 +106,8 @@ public readonly partial struct RayMarchShader : IComputeShader
                     {
                         // we hit an object
                         Vector3 normal = GetNormal(point, obj.Position, obj.Scale, obj.Rotation, obj.ObjectType);
-                        return Shade(point, normal,obj);
+                        //return VisualizePixleCost(checks);
+                        return Shade(point, normal, obj);
                     }
                 }
             }
@@ -105,17 +117,41 @@ public readonly partial struct RayMarchShader : IComputeShader
 
         return hitColor;
     }
+    
+    private Vector3 VisualizePixleCost(int checks)
+    {
+        float cost = checks / ((float)MaxSteps + Objects.Length);
+        
+        if (cost > 0.15f)
+        {
+            return new Vector3(1, 0, 0);
+        }
+        else if (cost > 0.05f)
+        {
+            return new Vector3(1, 1, 0);
+        }
+        else
+        {
+            return new Vector3(0, 1, 0);
+        }
+    }
 
     #endregion
 
     #region SDF functions
     
-    private float SceneSdf(Vector3 point)
+    private float SceneSdf(Vector3 point, Vector3 rayOrigin, Vector3 rayDirection)
     {
         float distance = float.MaxValue;
 
         for (int i = 0; i < Objects.Length; i++)
         {
+            // check if the ray intersects the bounding box
+            if(!Objects[i].BoundingBox.RayIntersects(rayOrigin, rayDirection))
+            {
+                continue;
+            }
+            
             float objDistance = ObjectSdf(point, Objects[i]);
             distance = MathF.Min(distance, objDistance);
         }
@@ -315,9 +351,9 @@ public readonly partial struct RayMarchShader : IComputeShader
     {
         float res = 1;
         float t = 0;
-        for (int i = 0; i < MaxSteps && t<tMax; i++)
+        for (int i = 0; i < MaxSteps / 2 && t<tMax; i++)
         {
-            float h = SceneSdf(rayOrigin + rayDir * t);
+            float h = SceneSdf(rayOrigin + rayDir * t, rayOrigin, rayDir);
             if (h < 0.001f)
             {
                 return 0;

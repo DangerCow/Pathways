@@ -20,7 +20,7 @@ public class DemoScene : Scene
         PathwayObject plane = new PathwayObject();
         plane.Position = new Vector3(0, 0, 0);
         plane.Rotation = new Rotation(new Vector3(0, 0, 0));
-        plane.Scale = new Vector3(10, 1, 10);
+        plane.Scale = new Vector3(25, 1, 25);
         plane.Color = Color.WHITE;
         plane.Type = PathwayObject.ObjectType.Plane;
         

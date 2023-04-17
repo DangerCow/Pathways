@@ -7,7 +7,7 @@ namespace Pathways;
 public class PathwayObject
 {
     public struct ShaderRepresentation
-    {
+    { 
         public Vector3 Position;
         public Vector4 Rotation;
         public Vector3 Scale;
@@ -16,6 +16,8 @@ public class PathwayObject
 
         public Vector3 Color;
         public float Smoothness;
+        
+        public AaBoundingBox BoundingBox;
     }
 
     public enum ObjectType
@@ -51,6 +53,41 @@ public class PathwayObject
         Type = ObjectType.Sphere;
         Color = Color.WHITE;
     }
+    
+    public AaBoundingBox GetBoundingBox()
+    {
+        // Scale the bounding box by 1.5 to make sure it's big enough
+        Vector3 scale = Scale * 1.5f;
+
+        Vector3 lowerBound = Position - scale;
+        Vector3 upperBound = Position + scale;
+        
+        // Apply rotation
+        Vector3[] corners = new Vector3[8];
+        corners[0] = lowerBound;
+        corners[1] = new Vector3(lowerBound.X, lowerBound.Y, upperBound.Z);
+        corners[2] = new Vector3(lowerBound.X, upperBound.Y, lowerBound.Z);
+        corners[3] = new Vector3(lowerBound.X, upperBound.Y, upperBound.Z);
+        corners[4] = new Vector3(upperBound.X, lowerBound.Y, lowerBound.Z);
+        corners[5] = new Vector3(upperBound.X, lowerBound.Y, upperBound.Z);
+        corners[6] = new Vector3(upperBound.X, upperBound.Y, lowerBound.Z);
+        corners[7] = upperBound;
+        
+        Vector3 min = new Vector3(float.MaxValue);
+        Vector3 max = new Vector3(float.MinValue);
+        
+        for (int i = 0; i < corners.Length; i++)
+        {
+            Vector3 transformed = Vector3.Transform(corners[i], Rotation.Value);
+            min = Vector3.Min(min, transformed);
+            max = Vector3.Max(max, transformed);
+        }
+        
+        lowerBound = min;
+        upperBound = max;
+
+        return new AaBoundingBox(lowerBound, upperBound);
+    }
 
     public virtual void Init()
     {
@@ -75,7 +112,8 @@ public class PathwayObject
             Scale = Scale,
             ObjectType = (int)Type,
             Color = color,
-            Smoothness = Smoothness
+            Smoothness = Smoothness,
+            BoundingBox = GetBoundingBox()
         };
     }
 }
