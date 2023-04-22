@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using ComputeSharp;
 
 namespace Pathways.Shaders;
@@ -7,7 +6,8 @@ namespace Pathways.Shaders;
 [AutoConstructor]
 public readonly partial struct RayMarchShader : IComputeShader
 {
-    public const int MaxSteps = 128;
+    public const int MaxSteps = 1024;
+    public const float TMin = 0.01f;
 
     public readonly ReadWriteBuffer<int> Buffer;
     public readonly int Width;
@@ -94,15 +94,13 @@ public readonly partial struct RayMarchShader : IComputeShader
 
                 // dont allow negative distances
                 if (distance < 0)
-                {
                     distance = float.MaxValue;
-                }
 
                 if (objDistance == distance)
                 {
                     closestObject = obj;
 
-                    if (distance < 0.001f)
+                    if (distance < TMin)
                     {
                         // we hit an object
                         Vector3 normal = GetNormal(point, obj.Position, obj.Scale, obj.Rotation, obj.ObjectType);
@@ -111,8 +109,12 @@ public readonly partial struct RayMarchShader : IComputeShader
                     }
                 }
             }
-
+            
             t += distance;
+            
+            // Dont allow t to go over tmax
+            if (t > tMax)
+                break;
         }
 
         return hitColor;
@@ -274,19 +276,19 @@ public readonly partial struct RayMarchShader : IComputeShader
                     
                     shadowRayDir = light.Position - point;
                     shadowRayDir = ShaderMath.Normalize(shadowRayDir);
-                    shadowRayOrigin = point + normal * 0.001f;
-                    
+                    shadowRayOrigin = point + normal * (TMin * 2);
+                        
                     lightAccumTemp *= Shadow(shadowRayOrigin, shadowRayDir, 100, 64);
                     
                     lightAccum += lightAccumTemp;
                     break;
                 // directional light
                 case 1:
-                    lightAccumTemp = LightAccumDirectional(point + normal * 0.001f, normal , obj, light);
+                    lightAccumTemp = LightAccumDirectional(point + normal * (TMin * 2), normal , obj, light);
                     
                     shadowRayDir = new Vector3(0, 0, 1);
                     shadowRayDir = ShaderMath.Transform(shadowRayDir, light.Rotation);
-                    shadowRayOrigin = point + normal * 0.001f;
+                    shadowRayOrigin = point + normal * (TMin * 2);
                     
                     lightAccumTemp *= Shadow(shadowRayOrigin, shadowRayDir, 100, 16);
                     
@@ -354,7 +356,7 @@ public readonly partial struct RayMarchShader : IComputeShader
         for (int i = 0; i < MaxSteps / 2 && t<tMax; i++)
         {
             float h = SceneSdf(rayOrigin + rayDir * t, rayOrigin, rayDir);
-            if (h < 0.001f)
+            if (h < TMin)
             {
                 return 0;
             }
